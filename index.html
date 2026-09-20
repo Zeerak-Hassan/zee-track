@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Logbook">
+<title>Logbook</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
+<link rel="apple-touch-icon" href="assets/icons/icon-180.png">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand-block">
+    <div class="eyebrow">Strength Log</div>
+    <div class="brand">Logbook</div>
+  </div>
+  <div class="date-stamp" id="dateStamp"></div>
+</header>
+
+<main>
+
+<section class="view active" id="view-home">
+  <div class="home-header">
+    <div>
+      <h2 class="view-title">Train.</h2>
+      <p class="view-sub home-status" id="homeHeroNote">No workouts yet.</p>
+    </div>
+    <button class="btn btn-primary" onclick="openRoutineEditor(null)">New Routine</button>
+  </div>
+
+  <div id="activeWorkoutBanner"></div>
+
+  <div class="section-label"><span>Routines</span><span class="text-faint" id="routineCountLabel"></span></div>
+  <div id="routinesList"></div>
+</section>
+
+<section class="view" id="view-history">
+  <h2 class="view-title">History.</h2>
+  <p class="view-sub" id="historySummary">Saved workouts appear here.</p>
+  <div id="historyList"></div>
+</section>
+
+<section class="view" id="view-progress">
+  <h2 class="view-title">Progress.</h2>
+  <p class="view-sub" id="progressSummary">Track your strongest lifts over time.</p>
+  <div id="progressList"></div>
+</section>
+
+<section class="view" id="view-routine-edit">
+  <button class="btn btn-ghost btn-sm mb-2" onclick="showView('home')">&larr; Back</button>
+  <h2 class="view-title" id="routineEditTitle">New Routine</h2>
+  <p class="view-sub">Build the template you will follow.</p>
+  <div class="form-grid mb-2">
+    <div>
+      <label>Routine Name</label>
+      <input type="text" id="routineNameInput" placeholder="Push Day A">
+    </div>
+  </div>
+  <div class="section-label"><span>Exercises</span><span id="routineExCount" class="num">0</span></div>
+  <div id="routineExercisesList"></div>
+  <button class="btn btn-ghost btn-block mt-2" onclick="openExercisePicker('routine')">Add Exercise</button>
+  <div class="modal-actions mt-3">
+    <button class="btn btn-danger" onclick="deleteCurrentRoutine()" id="deleteRoutineBtn">Delete</button>
+    <button class="btn btn-primary" onclick="saveRoutine()">Save</button>
+  </div>
+</section>
+
+<section class="view" id="view-workout">
+  <div class="workout-header">
+    <div>
+      <div class="label">Now Training</div>
+      <div class="workout-title" id="activeWorkoutName">Workout</div>
+    </div>
+  </div>
+  <div id="activeExercises"></div>
+  <button class="btn btn-ghost btn-block mt-2" onclick="openExercisePicker('workout')">Add Exercise</button>
+  <div class="modal-actions mt-3">
+    <button class="btn btn-danger" onclick="cancelWorkout()">Cancel</button>
+    <button class="btn btn-accent" onclick="finishWorkout()">Finish</button>
+  </div>
+</section>
+
+
+<section class="view" id="view-settings">
+  <h2 class="view-title">Settings.</h2>
+  <p class="view-sub">Your data lives only in this browser.</p>
+  <div class="settings-stack">
+    <div class="settings-panel">
+      <div class="section-label"><span>Backup</span></div>
+      <p class="text-dim mb-2 settings-copy">Export regularly. Save to Drive or email to yourself. If you clear browser data, only the export survives.</p>
+      <button class="btn btn-primary btn-block mb-2" onclick="exportData()">Export All Data (JSON)</button>
+      <button class="btn btn-ghost btn-block" onclick="document.getElementById('importInput').click()">Import from JSON</button>
+      <input type="file" id="importInput" accept=".json" class="hidden" onchange="importData(event)">
+    </div>
+    <div class="settings-panel settings-panel-danger">
+      <div class="section-label"><span>Danger Zone</span></div>
+      <p class="text-dim mb-2 settings-copy">Permanently deletes everything. Cannot be undone.</p>
+      <button class="btn btn-danger btn-block" onclick="confirmReset()">Erase Everything</button>
+    </div>
+    <div class="settings-panel">
+      <div class="section-label"><span>App</span></div>
+      <p class="text-dim settings-copy settings-status" id="appStatus">Mode - Browser</p>
+    </div>
+  </div>
+  <div class="rule mt-3">.</div>
+  <p class="center text-faint version-info" id="versionInfo">Logbook - v1.3.3</p>
+</section>
+
+</main>
+
+<button class="fab hidden" id="fab" onclick="onFabClick()">+</button>
+
+<nav class="tabs">
+  <button class="active" data-view="home" onclick="showView('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+    Train
+  </button>
+  <button data-view="history" onclick="showView('history')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg>
+    History
+  </button>
+  <button data-view="progress" onclick="showView('progress')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M7 15l4-4 3 3 5-7"/></svg>
+    Progress
+  </button>
+  <button data-view="settings" onclick="showView('settings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.7l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.7-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.7.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.7 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.7l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.7.3h.1a1.6 1.6 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.7-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.7v.1a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
+    Settings
+  </button>
+</nav>
+
+<div class="modal-backdrop" id="modalBackdrop" onclick="if(event.target===this)closeModal()">
+  <div class="modal"><div class="modal-handle"></div><div id="modalContent"></div></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div id="installBanner" class="install-banner hidden">
+  <div class="install-banner-text">
+    <strong>Install Logbook</strong>
+    <span>Add to home screen for full offline access</span>
+  </div>
+  <div class="install-banner-actions">
+    <button class="btn btn-sm btn-ghost" onclick="dismissInstallBanner()">Later</button>
+    <button class="btn btn-sm btn-primary" onclick="triggerInstall()">Install</button>
+  </div>
+</div>
+
+<script src="assets/js/app.js"></script>
+</body>
+</html>
