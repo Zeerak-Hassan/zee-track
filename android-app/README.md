@@ -1,4 +1,4 @@
-# Logbook Android — 1.4.0
+# Logbook Android — 1.4.1
 
 Offline Android package of the mobile design update. Requires Android 7.0 (API 24) or later and a functioning Android System WebView.
 
@@ -15,3 +15,5 @@ gradle assembleRelease assembleDebugAndroidTest lintRelease
 ```
 
 The application ID is `app.zeerak.logbook`. Target SDK is 35. Preserve the ID, storage origin and release signing key across updates.
+
+Open Sans is bundled locally under the SIL Open Font License; headings, controls, labels, and numbers use the same font without an online font service.

@@ -52,6 +52,7 @@ public class OfflineAppTest {
                 && Arrays.asList(info.requestedPermissions).contains("android.permission.INTERNET"));
         try {
             launch();
+            runAsync("await document.fonts.ready;if(![...document.fonts].some(font=>font.family.includes('Open Sans')&&font.status==='loaded'))throw Error('Offline Open Sans font missing');");
             runAsync("await dbPut('routines',{id:'offline-test',name:'Offline Strength',createdAt:Date.now(),exercises:[{name:'Bench Press',sets:3,reps:8,unit:'kg'}]});"
                     + "await startWorkoutFromRoutine('offline-test');updateSet(0,0,'weight','60');updateSet(0,0,'reps','8');toggleSetDone(0,0);await saveWorkoutDraft();await finishWorkout();");
             runAsync("const workouts=await getCompletedWorkouts();if(workouts.length!==1||workouts[0].exercises[0].sets[0].weight!=='60')throw Error('Saved workout missing');"
