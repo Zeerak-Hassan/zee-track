@@ -69,12 +69,15 @@ public class OfflineAppTest {
             runAsync("if((await getCompletedWorkouts()).length!==1)throw Error('History disappeared');");
             assertEquals("true", evaluate("document.documentElement.scrollWidth<=document.documentElement.clientWidth+1"));
             Bitmap screenshot = InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();
-            if (screenshot != null) {
-                try (FileOutputStream stream = new FileOutputStream(new File(context.getExternalFilesDir(null), "offline-workout.png"))) {
-                    screenshot.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                }
-                screenshot.recycle();
+            assertNotNull("Android screenshot unavailable", screenshot);
+            String outputPath = InstrumentationRegistry.getArguments().getString("additionalTestOutputDir");
+            assertNotNull("Test artifact output directory unavailable", outputPath);
+            File outputDirectory = new File(outputPath);
+            if (!outputDirectory.exists()) assertTrue(outputDirectory.mkdirs());
+            try (FileOutputStream stream = new FileOutputStream(new File(outputDirectory, "offline-workout.png"))) {
+                assertTrue(screenshot.compress(Bitmap.CompressFormat.PNG, 100, stream));
             }
+            screenshot.recycle();
         } finally { if (scenario != null) scenario.close(); }
     }
 }
