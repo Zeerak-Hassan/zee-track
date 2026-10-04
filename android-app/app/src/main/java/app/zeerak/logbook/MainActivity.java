@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Insets;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,7 +20,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 import androidx.webkit.WebViewAssetLoader;
 import java.io.ByteArrayInputStream;
 import java.io.OutputStream;
@@ -42,6 +43,15 @@ public final class MainActivity extends Activity {
         webView = new WebView(this);
         webView.setId(R.id.logbook_webview);
         webView.setBackgroundColor(Color.rgb(15, 15, 15));
+        webView.setHorizontalScrollBarEnabled(false);
+        if (Build.VERSION.SDK_INT >= 29) {
+            GradientDrawable thumb = new GradientDrawable();
+            thumb.setColor(Color.rgb(154, 111, 60));
+            thumb.setCornerRadius(8 * getResources().getDisplayMetrics().density);
+            webView.setVerticalScrollbarThumbDrawable(thumb);
+            webView.setVerticalScrollbarTrackDrawable(new ColorDrawable(Color.rgb(15, 15, 15)));
+            webView.setScrollBarSize(Math.round(3 * getResources().getDisplayMetrics().density));
+        } else webView.setVerticalScrollBarEnabled(false);
         root.addView(webView, new FrameLayout.LayoutParams(-1, -1));
         setContentView(root);
         root.setOnApplyWindowInsetsListener((view, insets) -> {
